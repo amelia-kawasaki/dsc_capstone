@@ -4,96 +4,68 @@ Fall 2021, Capstone Project with Professor Belkin
 """
 
 from sklearn import datasets
-from utils import LaplacianKernel, get_distance_matrices
+from utils import LaplacianKernel, get_distance_matrices, check_config_formatting, check_laplacian_config_formatting, \
+    check_gaussian_config_formatting, validation
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_squared_error, classification_report
-import numpy as np
+from feats import unmulticlass
+import json
+
+# read in parameters
+try:
+    with open('config.json') as json_file:
+        params = json.load(json_file)['params']
+except Exception:
+    print('failed to read param file')
+    raise
+
+# check config file formatting
+check_config_formatting(params)
+
+# get data
+if params['data']['dataset'] == 'mnist':
+    # importing the data
+    dataset = datasets.load_digits()
+    X = dataset.data
+    y = dataset.target
+
+    if params['data']['multiclass'] is False:
+        X, y = unmulticlass(X, y, (0, 1))
+
+    else:
+        raise Exception('multiclass not supported for this dataset yet')
+        # TODO support multiclass
+else:
+    raise Exception('given dataset not supported')
 
 
-# importing the data
-dataset = datasets.load_digits()
-X = dataset.data
-y = dataset.target
-
-# only taking two classes and re-labeling to -1 and 1
-y_idx = (y == 0)|(y == 1)
-y = y[y_idx]
-X = X[y_idx]
-y[y == 0] = -1
-
-# splitting the data into train/test/validation (.60, .20, .20)
+# splitting the data into train/test/validation .60, .20, .20)
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=1)
 X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.25, random_state=1)
 
-# calculating distance matrices
-d_train, d_test, d_val = get_distance_matrices('digits', mats=[X_train, X_test, X_val])
 
-# validation for laplacian kernel model
-# grid search for an optimal value of t
-accuracies = []
-grid_search = [0.0001, 0.001, 0.01, 0.1, 1, 10]
-for i in grid_search:
-    model = LaplacianKernel(t=i)
-    model.fit(X_train, y_train, distances=d_train)
-    prediction = model.predict(X_val, distances=d_val)
-    compare = sum(prediction == y_val)
-    accuracy = compare / len(y_val)
-    accuracies.append(accuracy)
+# getting the distance matrix for training
+if params['data']['distance_precalculations'] is True:
+    d_train, d_test, d_val = get_distance_matrices('digits', stored=True)
+else:
+    d_train, d_test, d_val = get_distance_matrices('digits', mats=[X_train, X_test, X_val])
 
-idx = np.argmax(accuracies)
-i = grid_search[idx]
-model = LaplacianKernel(t=i)
-model.fit(X_train, y_train, distances=d_train)
-prediction = model.predict(X_val, distances=d_val)
-compare = sum(prediction == y_val)
-accuracy = compare / len(y_val)
-accuracies.append(accuracy)
-print(i)
-print(accuracy)
-print(mean_squared_error(y_val, prediction))
-print(classification_report(y_val, prediction))
 
-# creating laplacian kernel model, fitting and predicting
-model = LaplacianKernel(t=i)
-model.fit(X_train, y_train, distances=d_train)
-prediction = model.predict(X_test, distances=d_test)
-compare = sum(prediction == y_test)
-accuracy = compare / len(y_test)
-print(accuracy)
-print(mean_squared_error(y_test, prediction))
-print(classification_report(y_test, prediction))
+# get model params
+alpha = None
 
-# validation for gaussian kernel model
-# grid search for an optimal value of t
-accuracies = []
-grid_search = [0.0001, 0.001, 0.01, 0.1, 1, 10]
-for i in grid_search:
-    model = LaplacianKernel(n=0.5, t=i)
-    model.fit(X_train, y_train, distances=d_train)
-    prediction = model.predict(X_val, distances=d_val)
-    compare = sum(prediction == y_val)
-    accuracy = compare / len(y_val)
-    accuracies.append(accuracy)
+if params['model']['model_type'] == 'Laplacian':
+    check_laplacian_config_formatting(params)
+    alpha = 1
 
-idx = np.argmax(accuracies)
-i = grid_search[idx]
-model = LaplacianKernel(n=0.5, t=i)
-model.fit(X_train, y_train, distances=d_train)
-prediction = model.predict(X_val, distances=d_val)
-compare = sum(prediction == y_val)
-accuracy = compare / len(y_val)
-accuracies.append(accuracy)
-print(i)
-print(accuracy)
-print(mean_squared_error(y_val, prediction))
-print(classification_report(y_val, prediction))
+elif params['model']['model_type'] == 'Gaussian':
+    check_gaussian_config_formatting(params)
+    alpha = 1/2
 
-# creating gaussian kernel model, fitting and predicting
-model = LaplacianKernel(n=0.5, t=i)
-model.fit(X_train, y_train, distances=d_train)
-prediction = model.predict(X_test, distances=d_test)
-compare = sum(prediction == y_test)
-accuracy = compare / len(y_test)
-print(accuracy)
-print(mean_squared_error(y_test, prediction))
-print(classification_report(y_test, prediction))
+else:
+    raise Exception('Given model_type unsupported')
+
+
+# creating laplacian kernel model, validating for t
+model = LaplacianKernel
+
+validation(model, [alpha], X_train, y_train, d_train, X_val, y_val, d_val)
