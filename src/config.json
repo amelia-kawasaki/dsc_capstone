@@ -1,6 +1,7 @@
 {"params": {
   "model" : {"model_type": "Laplacian", "t": 0.10},
-  "data": {"dataset": "mnist", "multiclass": false, "distance_precalculations": true, "distance_files": "digits"},
+  "data": {"dataset": "diabetes", "classification": false, "multiclass": false,
+    "distance_precalculations": true, "distance_files": "diab"},
   "validation":  {"validation_param":  "t"},
-  "testing": {"testing": true, "website": "apple.com", "from": "Alabama"}
+  "testing": {}
 }}

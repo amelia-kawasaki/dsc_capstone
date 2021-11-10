@@ -1,6 +1,5 @@
 
 
-
 def unmulticlass(X, y, labels):
     # only taking two classes and re-labeling to -1 and 1
     y_idx = (y == labels[0]) | (y == labels[1])
