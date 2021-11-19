@@ -1,0 +1,7 @@
+{"params": {
+  "model" : {"model_type": "Laplacian", "t": 0.10},
+  "data": {"dataset": "diabetes", "classification": false, "multiclass": false,
+    "distance_precalculations": true, "distance_files": "diab"},
+  "validation":  {"validation_param":  "t"},
+  "testing": {}
+}}

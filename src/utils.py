@@ -2,10 +2,13 @@
 Checkpoint Code - Amelia Kawasaki
 Fall 2021, Capstone Project with Professor Belkin
 """
-
+from sklearn import datasets
 import numpy as np
 from scipy.spatial import distance_matrix
 from numpy.linalg import inv as invert
+from sklearn.metrics import mean_squared_error, classification_report, r2_score
+import os
+from matplotlib import pyplot as plt
 
 
 class LaplacianKernel:
@@ -16,6 +19,12 @@ class LaplacianKernel:
         self.n = n
         self.alpha1 = alpha
         self.t = t
+
+    def set_t(self, t):
+        self.t = t
+
+    def get_t(self):
+        return self.t
 
     def create_matrix(self, d_matrix):
         """
@@ -89,6 +98,27 @@ class LaplacianKernel:
                 y = rounding_v(y)
             return y
 
+def load_random_regression():
+    n_samples = 1000
+    n_outliers = 50
+
+    X, y, coef = datasets.make_regression(
+        n_samples=n_samples,
+        n_features=1,
+        n_informative=1,
+        noise=100,
+        coef=True,
+        random_state=0,
+    )
+
+    # Add outlier data
+    # np.random.seed(0)
+    # X[:n_outliers] = 3 + 0.5 * np.random.normal(size=(n_outliers, 1))
+    # y[:n_outliers] = -3 + 10 * np.random.normal(size=n_outliers)
+
+    plt.scatter(X, y)
+    plt.show()
+    return X, y
 
 def get_distance_matrices(title, stored=False, mats=None):
     """
@@ -101,18 +131,124 @@ def get_distance_matrices(title, stored=False, mats=None):
 
     m_list = []
     if stored is True:
-        for i in ['train', 'test', 'validation']:
-            m_list.append(np.load(title + '_' + i))
+        for i in ['train', 'test', 'val']:
+            path = os.path.join('..', 'data', title + '_' + i + '.npy')
+            m_list.append(np.load(path))
 
     else:
         d_train = distance_matrix(mats[0], mats[0])
-        np.save(title + '_train', d_train)
+        path = os.path.join('..', 'data', title + '_train')
+        np.save(path, d_train)
         m_list.append(d_train)
         d_test = distance_matrix(mats[0], mats[1])
-        np.save(title + '_test', d_test)
+        path = os.path.join('..', 'data', title + '_test')
+        np.save(path, d_test)
         m_list.append(d_test)
         d_val = distance_matrix(mats[0], mats[2])
-        np.save(title + '_val', d_val)
+        path = os.path.join('..', 'data', title + '_val')
+        np.save(path, d_val)
         m_list.append(d_val)
 
     return m_list[0], m_list[1], m_list[2]
+
+
+def check_config_formatting(params):
+    for i in ['data', 'model', 'validation', 'testing']:
+        if i not in params.keys():
+            raise ValueError('config file not formatted correctly')
+    for i in ['dataset', 'classification', 'distance_precalculations', 'distance_files']:
+        if i not in params['data'].keys():
+            raise ValueError('"data" in config file is not formatted correctly')
+    for i in ['model_type']:
+        if i not in params['model'].keys():
+            raise ValueError('"model" in config file is not formatted correctly')
+    for i in ['validation_param']:
+        if i not in params['validation'].keys():
+            raise ValueError('"validation" in config file is not formatted correctly')
+
+
+def check_laplacian_config_formatting(params):
+    # for i in ['t']:
+    #     if i not in params['model'].keys():
+    #         raise ValueError('correct parameters not specified for model training (Laplacian)')
+    return
+
+
+def check_gaussian_config_formatting(params):
+    # for i in ['t']:
+    #     if i not in params['model'].keys():
+    #         raise ValueError('correct parameters not specified for model training (Laplacian)')
+    return
+
+
+def comparison_metric(a, b, classification):
+    if classification:
+        r = sum(a == b)/ len(a)
+    else:
+        r = mean_squared_error(a, b)
+    return r
+
+
+def validation(m, m_params, X_train, y_train, d_train, X_val, y_val, d_val, classification):
+    # validation for laplacian kernel model
+    # grid search for an optimal value of t
+
+    model = m(alpha=m_params[0])
+    model.fit(X_train, y_train, distances=d_train)
+    prediction = model.predict(X_train, distances=d_train, classification=classification)
+    compare = comparison_metric(prediction, y_train, classification)
+    print('----------Training-------------')
+    print('t used for training: ' + str(model.get_t()))
+    if classification:
+        print('accuracy on training data: ' + str(compare))
+    else:
+        print('mse on training data: ' + str(compare))
+        print('rse on training data: ' + str(mean_squared_error(prediction, y_train, squared=False)))
+        print('r squared on validation data: ' + str(r2_score(y_train, prediction)))
+    scores = []
+    grid_search = [None, 0.00001, 0.0001, 0.001, 0.01, 0.1, 1, 10, 100, 1000]
+    alpha = m_params[0]
+
+    for i in grid_search:
+        model = m(t=i, alpha=alpha)
+        model.fit(X_train, y_train, distances=d_train)
+        prediction = model.predict(X_val, distances=d_val, classification=classification)
+        compare = comparison_metric(prediction, y_val, classification)
+        scores.append(compare)
+
+    print('----------Validation-----------')
+    idx = np.argmax(scores)
+    i = grid_search[idx]
+    model = m(t=i, alpha=alpha)
+    model.fit(X_train, y_train, distances=d_train)
+    prediction = model.predict(X_val, distances=d_val, classification=classification)
+    compare = comparison_metric(prediction, y_val, classification)
+    scores.append(compare)
+    if i is None:
+        print("ideal t is " + str(model.get_t()) + " (default)")
+    else:
+        print("ideal t is " + str(i))
+
+    if classification:
+        print("accuracy on validation data: " + str(compare))
+    else:
+        print("mse on validation data: " + str(mean_squared_error(y_val, prediction)))
+        print('rse on validation data: ' + str(mean_squared_error(y_val, prediction, squared=False)))
+        print('r squared on validation data: ' + str(r2_score(y_val, prediction)))
+    return model
+
+
+def testing(model, X_test, y_test, d_test, classification):
+
+    prediction = model.predict(X_test, distances=d_test, classification=classification)
+    compare = comparison_metric(prediction, y_test, classification)
+    print('----------Testing--------------')
+    print('t used for testing: ' + str(model.get_t()))
+    if classification:
+        print('accuracy on testing data: ' + str(compare))
+        print(classification_report(y_test, prediction))
+    else:
+        print('mse on testing data: ' + str(compare))
+        print('rse on testing data: ' + str(mean_squared_error(y_test, prediction, squared=False)))
+        print('r squared on validation data: ' + str(r2_score(y_test, prediction)))
+

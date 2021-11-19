@@ -1,0 +1,7 @@
+{"params": {
+  "model" : {"model_type": "Laplacian", "t": 0.10},
+  "data": {"dataset": "random regression", "classification": false, "multiclass": false,
+    "distance_precalculations": false, "distance_files": "rr"},
+  "validation":  {"validation_param":  "t"},
+  "testing": {}
+}}

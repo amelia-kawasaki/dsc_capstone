@@ -1,0 +1,7 @@
+{"params": {
+  "model" : {"model_type": "Laplacian"},
+  "data": {"dataset": "mnist", "classification": true, "multiclass": false,
+    "distance_precalculations": false, "distance_files": "digits"},
+  "validation":  {"validation_param":  "t"},
+  "testing": {}
+}}
