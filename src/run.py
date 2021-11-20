@@ -6,6 +6,7 @@ Fall 2021, Capstone Project with Professor Belkin
 import etl
 import utils
 from argparse import ArgumentParser
+import os
 
 parser = ArgumentParser()
 parser.add_argument('target', type=str, metavar="TARGET")
@@ -14,6 +15,7 @@ args = parser.parse_args()
 
 if args.target == 'test':
     print("testing with test data")
+    path = os.path.join("..", "test", "test_config.json")
     data, params, alpha, classification = etl.etl_data("../test/test_config.json")
 elif args.target == 'all':
     print("running with " + str(args.file))
