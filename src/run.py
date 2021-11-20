@@ -15,8 +15,9 @@ args = parser.parse_args()
 
 if args.target == 'test':
     print("testing with test data")
-    print(os.path.dirname(os.path.realpath(__file__)))
-    path = os.path.join("..", "test", "test_config.json")
+    dir = os.path.dirname(os.path.realpath(__file__))
+    path = os.path.join(dir, "..", "test", "test_config.json")
+    print(path)
     data, params, alpha, classification = etl.etl_data(path)
 elif args.target == 'all':
     print("running with " + str(args.file))
