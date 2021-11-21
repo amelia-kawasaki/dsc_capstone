@@ -130,22 +130,23 @@ def get_distance_matrices(title, stored=False, mats=None):
     """
 
     m_list = []
+    dir = os.path.dirname(os.path.realpath(__file__))
     if stored is True:
         for i in ['train', 'test', 'val']:
-            path = os.path.join('..', 'data', title + '_' + i + '.npy')
+            path = os.path.join(dir, '..', 'data', title + '_' + i + '.npy')
             m_list.append(np.load(path))
 
     else:
         d_train = distance_matrix(mats[0], mats[0])
-        path = os.path.join('..', 'data', title + '_train')
+        path = os.path.join(dir, '..', 'data', title + '_train')
         np.save(path, d_train)
         m_list.append(d_train)
         d_test = distance_matrix(mats[0], mats[1])
-        path = os.path.join('..', 'data', title + '_test')
+        path = os.path.join(dir, '..', 'data', title + '_test')
         np.save(path, d_test)
         m_list.append(d_test)
         d_val = distance_matrix(mats[0], mats[2])
-        path = os.path.join('..', 'data', title + '_val')
+        path = os.path.join(dir, '..', 'data', title + '_val')
         np.save(path, d_val)
         m_list.append(d_val)
 
