@@ -120,7 +120,7 @@ def load_random_regression():
     plt.show()
     return X, y
 
-def get_distance_matrices(title, stored=False, mats=None):
+def get_distance_matrices(title, stage=None, stored=False, mats=None):
     """
     Creates or loads matrices of distances between data points
     :param title: string
@@ -128,25 +128,29 @@ def get_distance_matrices(title, stored=False, mats=None):
     :param mats: list of length 3
     :return: np array, np array, np array
     """
-
-    m_list = []
     dir = os.path.dirname(os.path.realpath(__file__))
+    if stage == 'test':
+        dir2 = os.path.join(dir, '..', 'test', 'testdata')
+    else:
+        dir2 = os.path.join(dir, '..', 'data')
+    m_list = []
+
     if stored is True:
         for i in ['train', 'test', 'val']:
-            path = os.path.join(dir, '..', 'data', title + '_' + i + '.npy')
+            path = os.path.join(dir2, title + '_' + i + '.npy')
             m_list.append(np.load(path))
 
     else:
         d_train = distance_matrix(mats[0], mats[0])
-        path = os.path.join(dir, '..', 'data', title + '_train')
+        path = os.path.join(dir2, title + '_train')
         np.save(path, d_train)
         m_list.append(d_train)
         d_test = distance_matrix(mats[0], mats[1])
-        path = os.path.join(dir, '..', 'data', title + '_test')
+        path = os.path.join(dir2, title + '_test')
         np.save(path, d_test)
         m_list.append(d_test)
         d_val = distance_matrix(mats[0], mats[2])
-        path = os.path.join(dir, '..', 'data', title + '_val')
+        path = os.path.join(dir2, title + '_val')
         np.save(path, d_val)
         m_list.append(d_val)
 

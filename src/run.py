@@ -18,7 +18,7 @@ if args.target == 'test':
     dir = os.path.dirname(os.path.realpath(__file__))
     path = os.path.join(dir, "..", "test", "test_config.json")
     print(path)
-    data, params, alpha, classification = etl.etl_data(path)
+    data, params, alpha, classification = etl.etl_data(path, stage="test")
 elif args.target == 'all':
     print("running with " + str(args.file))
     data, params, alpha, classification = etl.etl_data(args.file)
