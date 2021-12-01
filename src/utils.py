@@ -98,6 +98,7 @@ class LaplacianKernel:
                 y = rounding_v(y)
             return y
 
+
 def load_random_regression():
     n_samples = 1000
     n_outliers = 50
@@ -119,6 +120,7 @@ def load_random_regression():
     plt.scatter(X, y)
     plt.show()
     return X, y
+
 
 def get_distance_matrices(title, stage=None, stored=False, mats=None):
     """

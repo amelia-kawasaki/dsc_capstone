@@ -7,3 +7,9 @@ def unmulticlass(X, y, labels):
     X = X[y_idx]
     y[y == 0] = -1
     return X, y
+
+
+def unmulticlass2(y, label):
+    y[y != label] = -1
+    y[y == label] = 1
+    return y

@@ -1,7 +1,7 @@
 import json
 from sklearn import datasets
 from sklearn.model_selection import train_test_split
-from feats import unmulticlass
+from feats import unmulticlass, unmulticlass2
 import utils
 
 
@@ -45,6 +45,7 @@ def get_raw_data(params):
 
         if params['data']['multiclass'] is False:
             X, y = unmulticlass(X, y, (0, 1))
+
         else:
             raise Exception('multiclass not supported for this dataset yet')
             # TODO support multiclass
@@ -76,8 +77,10 @@ def train_test_val_distances(X, y, params, stage):
     return [(X_train, d_train, y_train), (X_test, d_test, y_test), (X_val, d_val, y_val)]
 
 
-def etl_data(config_file, stage=None):
-    params, alpha, classification = read_params(config_file)
+def etl_data(params, stage=None):
     X, y = get_raw_data(params)
     data = train_test_val_distances(X, y, params, stage=stage)
-    return data, params, alpha, classification
+    return data
+
+
+
