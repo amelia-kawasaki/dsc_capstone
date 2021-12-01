@@ -1,7 +1,8 @@
 import json
 from sklearn import datasets
 from sklearn.model_selection import train_test_split
-from feats import unmulticlass, unmulticlass2
+from feats import unmulticlass
+import numpy as np
 import utils
 
 
@@ -43,29 +44,21 @@ def get_raw_data(params):
         X = dataset.data
         y = dataset.target
 
-        if params['data']['multiclass'] is False:
-            X, y = unmulticlass(X, y, (0, 1))
+        # todo multiclass here
+        y_stack = np.zeros_like(y.reshape(-1, 1))
+        for i in np.unique(y):
+            y_stack = np.hstack((y_stack, unmulticlass(y, i).reshape(-1, 1)))
 
-        else:
-            raise Exception('multiclass not supported for this dataset yet')
-            # TODO support multiclass
-    elif params['data']['dataset'] == 'diabetes':
-        dataset = datasets.load_diabetes()
-        X = dataset.data
-        y = dataset.target
-
-    elif params['data']['dataset'] == 'random regression':
-        X, y = utils.load_random_regression()
     else:
         raise Exception('given dataset not supported')
 
-    return X, y
+    return X, y, y_stack[:, 1:]
 
 
-def train_test_val_distances(X, y, params, stage):
+def train_test_val_distances(X, y, y_stack, params, stage):
     # splitting the data into train/test/validation .60, .20, .20)
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=1)
-    X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.25, random_state=1)
+    X_train, X_test, y_train, y_test, y_stack_train, y_stack_test = train_test_split(X, y, y_stack, test_size=0.25)
+    X_train, X_val, y_train, y_val, y_stack_train, y_stack_val = train_test_split(X_train, y_train, y_stack_train, test_size=0.25)
 
 
     # getting the distance matrix for training
@@ -74,12 +67,12 @@ def train_test_val_distances(X, y, params, stage):
     else:
         d_train, d_test, d_val = utils.get_distance_matrices(params['data']['distance_files'], stage=stage, mats=[X_train, X_test, X_val])
 
-    return [(X_train, d_train, y_train), (X_test, d_test, y_test), (X_val, d_val, y_val)]
+    return [(X_train, d_train, y_train, y_stack_train), (X_test, d_test, y_test, y_stack_test), (X_val, d_val, y_val, y_stack_val)]
 
 
 def etl_data(params, stage=None):
-    X, y = get_raw_data(params)
-    data = train_test_val_distances(X, y, params, stage=stage)
+    X, y, y_stack = get_raw_data(params)
+    data = train_test_val_distances(X, y, y_stack, params, stage=stage)
     return data
 
 

@@ -2,11 +2,13 @@
 Checkpoint Code - Amelia Kawasaki
 Fall 2021, Capstone Project with Professor Belkin
 """
+import numpy as np
 
 import etl
 import utils
 from argparse import ArgumentParser
 import os
+from sklearn.metrics import classification_report
 
 parser = ArgumentParser()
 parser.add_argument('target', type=str, metavar="TARGET")
@@ -27,9 +29,23 @@ else:
 params, alpha, classification = etl.read_params(path)
 data = etl.etl_data(params, stage=args.target)
 
-[(X_train, d_train, y_train), (X_test, d_test, y_test), (X_val, d_val, y_val)] = data
+[(X_train, d_train, y_train, y_stack_train), (X_test, d_test, y_test, y_stack_test), (X_val, d_val, y_val, y_stack_val)] = data
 
 # creating kernel model, validating for t
-model = utils.LaplacianKernel
-model = utils.validation(model, [alpha], X_train, y_train, d_train, X_val, y_val, d_val, classification)
-model = utils.testing(model, X_test, y_test, d_test, classification)
+y_final_test = np.zeros((X_test.shape[0], y_stack_train.shape[1]))
+y_final_train = np.zeros((X_train.shape[0], y_stack_train.shape[1]))
+for i in range(y_stack_train.shape[1]):
+    model = utils.LaplacianKernel
+    model, train_prediction = utils.validation(model, [alpha], X_train, y_stack_train[:, i], d_train, X_val, y_stack_val[:, i], d_val, classification)
+    prediction = utils.testing(model, X_test, y_stack_test[:, i], d_test, classification)
+    y_final_test[:, i] = prediction
+    y_final_train[:, i] = train_prediction
+
+
+y1 = y_final_test.argmax(axis=1)
+y2 = y_final_train.argmax(axis=1)
+print('Training Results')
+print(classification_report(y_train, y2))
+print('Testing Results')
+report = classification_report(y_test, y1)
+print(report)

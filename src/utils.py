@@ -88,14 +88,6 @@ class LaplacianKernel:
             K = self.create_matrix(d_matrix)
             y = np.dot(self.alpha, K)
 
-            if classification:
-                def rounding(x):
-                    if x > 0:
-                        return 1
-                    else:
-                        return -1
-                rounding_v = np.vectorize(rounding)
-                y = rounding_v(y)
             return y
 
 
@@ -199,19 +191,12 @@ def comparison_metric(a, b, classification):
 def validation(m, m_params, X_train, y_train, d_train, X_val, y_val, d_val, classification):
     # validation for laplacian kernel model
     # grid search for an optimal value of t
-
+    print('----------Training-------------')
     model = m(alpha=m_params[0])
     model.fit(X_train, y_train, distances=d_train)
     prediction = model.predict(X_train, distances=d_train, classification=classification)
-    compare = comparison_metric(prediction, y_train, classification)
-    print('----------Training-------------')
-    print('t used for training: ' + str(model.get_t()))
-    if classification:
-        print('accuracy on training data: ' + str(compare))
-    else:
-        print('mse on training data: ' + str(compare))
-        print('rse on training data: ' + str(mean_squared_error(prediction, y_train, squared=False)))
-        print('r squared on validation data: ' + str(r2_score(y_train, prediction)))
+    # compare = comparison_metric(prediction_r, y_train, classification)
+
     scores = []
     grid_search = [None, 0.00001, 0.0001, 0.001, 0.01, 0.1, 1, 10, 100, 1000]
     alpha = m_params[0]
@@ -223,39 +208,17 @@ def validation(m, m_params, X_train, y_train, d_train, X_val, y_val, d_val, clas
         compare = comparison_metric(prediction, y_val, classification)
         scores.append(compare)
 
-    print('----------Validation-----------')
+    # print('----------Validation-----------')
     idx = np.argmax(scores)
     i = grid_search[idx]
     model = m(t=i, alpha=alpha)
     model.fit(X_train, y_train, distances=d_train)
-    prediction = model.predict(X_val, distances=d_val, classification=classification)
-    compare = comparison_metric(prediction, y_val, classification)
-    scores.append(compare)
-    if i is None:
-        print("ideal t is " + str(model.get_t()) + " (default)")
-    else:
-        print("ideal t is " + str(i))
-
-    if classification:
-        print("accuracy on validation data: " + str(compare))
-    else:
-        print("mse on validation data: " + str(mean_squared_error(y_val, prediction)))
-        print('rse on validation data: ' + str(mean_squared_error(y_val, prediction, squared=False)))
-        print('r squared on validation data: ' + str(r2_score(y_val, prediction)))
-    return model
+    prediction = model.predict(X_train, distances=d_train, classification=classification)
+    return model, prediction
 
 
 def testing(model, X_test, y_test, d_test, classification):
 
     prediction = model.predict(X_test, distances=d_test, classification=classification)
-    compare = comparison_metric(prediction, y_test, classification)
-    print('----------Testing--------------')
-    print('t used for testing: ' + str(model.get_t()))
-    if classification:
-        print('accuracy on testing data: ' + str(compare))
-        print(classification_report(y_test, prediction))
-    else:
-        print('mse on testing data: ' + str(compare))
-        print('rse on testing data: ' + str(mean_squared_error(y_test, prediction, squared=False)))
-        print('r squared on validation data: ' + str(r2_score(y_test, prediction)))
+    return prediction
 
