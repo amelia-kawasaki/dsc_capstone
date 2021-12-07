@@ -1,4 +1,4 @@
 {
-    "dockerhub-id": "<user>/<image>:<tag>",
-    "build-script": "python "
+    "dockerhub-id": "aakawasa/dsc180a:latest",
+    "build-script": "python run.py"
 }
