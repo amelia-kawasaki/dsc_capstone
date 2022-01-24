@@ -9,7 +9,7 @@ from numpy.linalg import inv as invert
 from sklearn.metrics import mean_squared_error, classification_report, r2_score
 import os
 from matplotlib import pyplot as plt
-
+import random
 
 class LaplacianKernel:
     def __init__(self, alpha=1, n=1, t=None):
@@ -222,3 +222,14 @@ def testing(model, X_test, y_test, d_test, classification):
     prediction = model.predict(X_test, distances=d_test, classification=classification)
     return prediction
 
+
+def add_image_corruption(X, level=0.1):
+    corrupt_elem = round(X.shape[0] * X.shape[1] * level)
+    corrupt_coor = []
+    while len(corrupt_coor) < corrupt_elem:
+        x_coor = random.randint(0, X.shape[0] - 1)
+        y_coor = random.randint(0, X.shape[1] - 1)
+        val = random.randint(0, 16)
+        corrupt_coor.append((x_coor, y_coor))
+        X[x_coor, y_coor] = val
+    return X

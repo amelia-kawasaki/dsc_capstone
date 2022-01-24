@@ -45,14 +45,13 @@ def get_raw_data(params):
         X = dataset.data
         y = dataset.target
 
-        # todo multiclass here
         y_stack = np.zeros_like(y.reshape(-1, 1))
         for i in np.unique(y):
             y_stack = np.hstack((y_stack, unmulticlass(y, i).reshape(-1, 1)))
 
     elif params['data']['dataset'] == 'blobs':
         X, y = datasets.make_blobs(n_samples=5_000, centers=10, random_state=0, n_features=64)
-        # todo multiclass here
+
         y_stack = np.zeros_like(y.reshape(-1, 1))
         for i in np.unique(y):
             y_stack = np.hstack((y_stack, unmulticlass(y, i).reshape(-1, 1)))
@@ -62,18 +61,22 @@ def get_raw_data(params):
     return X, y, y_stack[:, 1:]
 
 
-def train_test_val_distances(X, y, y_stack, params, stage, shuffled):
+def train_test_val_distances(X, y, y_stack, params, stage, shuffled, corruption):
     # splitting the data into train/test/validation .60, .20, .20)
     X_train, X_test, y_train, y_test, y_stack_train, y_stack_test = train_test_split(X, y, y_stack, test_size=0.25)
     X_train, X_val, y_train, y_val, y_stack_train, y_stack_val = train_test_split(X_train, y_train, y_stack_train, test_size=0.25)
 
-    ix_size = int(shuffled * len(y_train))
-    ix = np.random.choice(len(y_train), size=ix_size, replace=False)
-    b = y_train[ix]
-    c = y_stack_train[ix, :]
-    b_shuffled, c_shuffled = sklearn.utils.shuffle(b, c)
-    y_train[ix] = b_shuffled
-    y_stack_train[ix] = c_shuffled
+    if shuffled > 0.0:
+        ix_size = int(shuffled * len(y_train))
+        ix = np.random.choice(len(y_train), size=ix_size, replace=False)
+        b = y_train[ix]
+        c = y_stack_train[ix, :]
+        b_shuffled, c_shuffled = sklearn.utils.shuffle(b, c)
+        y_train[ix] = b_shuffled
+        y_stack_train[ix] = c_shuffled
+
+    if corruption > 0.0:
+        X_train = utils.add_image_corruption(X_train, level=corruption)
 
     # getting the distance matrix for training
     if params['data']['distance_precalculations'] is True:
@@ -84,13 +87,13 @@ def train_test_val_distances(X, y, y_stack, params, stage, shuffled):
     return [(X_train, d_train, y_train, y_stack_train), (X_test, d_test, y_test, y_stack_test), (X_val, d_val, y_val, y_stack_val)]
 
 
-def etl_data(params, shuffled=0.0, stage=None):
+def etl_data(params, shuffled=0.0, corruption=0.0, stage=None):
     X, y, y_stack = get_raw_data(params)
     if stage == 'test':
         X = X[:10, :]
         y = y[:10]
         y_stack = y_stack[:10, :]
-    data = train_test_val_distances(X, y, y_stack, params, stage, shuffled)
+    data = train_test_val_distances(X, y, y_stack, params, stage, shuffled, corruption)
     return data
 
 

@@ -1,5 +1,5 @@
 {"params": {
-  "model" : {"model_type": "Gaussian"},
+  "model" : {"model_type": "Laplacian"},
   "data": {"dataset": "mnist", "classification": true,
     "distance_precalculations": false, "distance_files": "digits"},
   "validation":  {"validation_param":  "t"},
