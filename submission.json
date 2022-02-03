@@ -1,4 +1,0 @@
-{
-    "dockerhub-id": "aakawasa/dsc180a:latest",
-    "build-script": "python src/run.py"
-}
