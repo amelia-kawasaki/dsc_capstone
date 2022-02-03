@@ -49,7 +49,7 @@ def classification(predictions, y_test):
     for i, j in zip(preds, y_test):
         if i == j:
             correct += 1
-    return 1 - (correct / len(y_test))
+    return correct / len(y_test)
 
 def run_kernel(train_X, train_y, test_X, test_y, num_labels, power, D_train = None, D_test = None):
     """
@@ -72,9 +72,9 @@ def run_kernel(train_X, train_y, test_X, test_y, num_labels, power, D_train = No
     alpha = np.matmul(K_train_inv, y_matrix)
 
     predictions = np.matmul(K_test, alpha)
-    kernel_err = round(classification(predictions, test_y), 5)
+    kernel_acc = round(classification(predictions, test_y), 5)
 
-    return kernel_err
+    return kernel_acc
 
 def run_label_corruption_kernels(train_X, train_y, test_X, test_y, num_labels, powers, corruption_levels):
     
@@ -94,20 +94,20 @@ def run_label_corruption_kernels(train_X, train_y, test_X, test_y, num_labels, p
 
     D_test = euclidean_distance(test_X, train_X)
 
-    errors = {}
+    accs = {}
     for p in powers:
-        errors[p] = []
+        accs[p] = []
 
     for c in corruption_levels:
         corrupted_y = train_y.copy()
         corrupted_y = cor.label_randomizer(corrupted_y, c)
 
         for p in powers:
-            err = run_kernel(None, corrupted_y, test_X, test_y, num_labels, p, D_train, D_test)
+            acc = run_kernel(None, corrupted_y, test_X, test_y, num_labels, p, D_train, D_test)
             
-            errors[p].append(err)
+            accs[p].append(acc)
 
-    return errors
+    return accs
 
 def run_random_corruption_kernels(train_X, train_y, test_X, test_y, num_labels, powers, corruption_levels):
 
@@ -123,9 +123,9 @@ def run_random_corruption_kernels(train_X, train_y, test_X, test_y, num_labels, 
     test_X = np.array(X)
     del X
     
-    errors = {}
+    accs = {}
     for p in powers:
-        errors[p] = []
+        accs[p] = []
 
     for c in corruption_levels:
 
@@ -136,11 +136,11 @@ def run_random_corruption_kernels(train_X, train_y, test_X, test_y, num_labels, 
         D_test = euclidean_distance(test_X, corrupted_X)
 
         for p in powers:
-            err = run_kernel(None, train_y, test_X, test_y, num_labels, p, D_train, D_test)
+            acc = run_kernel(None, train_y, test_X, test_y, num_labels, p, D_train, D_test)
             
-            errors[p].append(err)
+            accs[p].append(acc)
 
-    return errors
+    return accs
 
 def run_gaussian_blur_kernels(train_X, train_y, test_X, test_y, num_labels, powers, filter_sizes, sigmas):
 
@@ -150,11 +150,11 @@ def run_gaussian_blur_kernels(train_X, train_y, test_X, test_y, num_labels, powe
     test_X = np.array(X)
     del X
     
-    errors = {}
+    accs = {}
     for f in filter_sizes:
-        errors[f] = {}
+        accs[f] = {}
         for p in powers:
-            errors[f][p] = []
+            accs[f][p] = []
 
     for f in filter_sizes:
         for s in sigmas:
@@ -165,8 +165,8 @@ def run_gaussian_blur_kernels(train_X, train_y, test_X, test_y, num_labels, powe
             D_test = euclidean_distance(test_X, corrupted_X)
 
             for p in powers:
-                err = run_kernel(None, train_y, test_X, test_y, num_labels, p, D_train, D_test)
+                acc = run_kernel(None, train_y, test_X, test_y, num_labels, p, D_train, D_test)
                 
-                errors[f][p].append(err)
+                accs[f][p].append(acc)
     
-    return errors
+    return accs

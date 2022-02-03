@@ -6,9 +6,9 @@ def run_forest(train_X, train_y, test_X, test_y, num_trees):
     
     clf = RandomForestClassifier(n_estimators = num_trees, criterion = 'entropy').fit(train_X, train_y)
     
-    error = 1 - clf.score(test_X, test_y)
+    acc = clf.score(test_X, test_y)
     
-    return error
+    return acc
 
 def run_label_corruption_forests(train_X, train_y, test_X, test_y, num_labels, forest_sizes, corruption_levels):
     
@@ -24,9 +24,9 @@ def run_label_corruption_forests(train_X, train_y, test_X, test_y, num_labels, f
     test_X = np.array(X)
     del X
     
-    errors = {}
+    accs = {}
     for n in forest_sizes:
-        errors[n] = []
+        accs[n] = []
     
     for c in corruption_levels:
         
@@ -35,11 +35,11 @@ def run_label_corruption_forests(train_X, train_y, test_X, test_y, num_labels, f
         
         for n in forest_sizes:
             
-            error = round(run_forest(train_X, corrupted_y, test_X, test_y, n), 5)
+            acc = round(run_forest(train_X, corrupted_y, test_X, test_y, n), 5)
             
-            errors[n].append(error)
+            accs[n].append(acc)
         
-    return errors
+    return accs
 
 def run_random_corruption_forests(train_X, train_y, test_X, test_y, num_labels, forest_sizes, corruption_levels):
     
@@ -55,9 +55,9 @@ def run_random_corruption_forests(train_X, train_y, test_X, test_y, num_labels, 
     test_X = np.array(X)
     del X
     
-    errors = {}
+    accs = {}
     for n in forest_sizes:
-        errors[n] = []
+        accs[n] = []
     
     for c in corruption_levels:
         
@@ -66,11 +66,11 @@ def run_random_corruption_forests(train_X, train_y, test_X, test_y, num_labels, 
         
         for n in forest_sizes:
             
-            error = round(run_forest(corrupted_X, train_y, test_X, test_y, n), 5)
+            acc = round(run_forest(corrupted_X, train_y, test_X, test_y, n), 5)
             
-            errors[n].append(error)
+            accs[n].append(acc)
         
-    return errors
+    return accs
 
 def run_gaussian_blur_forests(train_X, train_y, test_X, test_y, num_labels, forest_sizes, filter_sizes, sigmas):
     
@@ -80,11 +80,11 @@ def run_gaussian_blur_forests(train_X, train_y, test_X, test_y, num_labels, fore
     test_X = np.array(X)
     del X
     
-    errors = {}
+    accs = {}
     for f in filter_sizes:
-        errors[f] = {}
+        accs[f] = {}
         for n in forest_sizes:
-            errors[f][n] = []
+            accs[f][n] = []
             
     for f in filter_sizes:
         for s in sigmas:
@@ -93,8 +93,8 @@ def run_gaussian_blur_forests(train_X, train_y, test_X, test_y, num_labels, fore
             
             for n in forest_sizes:
                 
-                error = round(run_forest(corrupted_X, train_y, test_X, test_y, n), 5)
+                acc = round(run_forest(corrupted_X, train_y, test_X, test_y, n), 5)
                 
-                errors[f][n].append(error)
+                accs[f][n].append(acc)
     
-    return errors
+    return accs
