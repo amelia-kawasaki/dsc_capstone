@@ -3,6 +3,7 @@ Checkpoint Code - Amelia Kawasaki
 Fall 2021, Capstone Project with Professor Belkin
 """
 from sklearn import datasets
+import sklearn
 import numpy as np
 from scipy.spatial import distance_matrix
 from numpy.linalg import inv as invert
@@ -114,6 +115,21 @@ def load_random_regression():
     return X, y
 
 
+def minkowski_distance(X, Y, p=2):
+    D = np.zeros((X.shape[0], Y.shape[0]))
+
+    if Y is X:
+        for i in range(X.shape[0] - 1):
+            distances = (np.sum((abs(X[(i + 1):] - X[i])) ** p, axis=1)) ** (1 / p)
+            D[i, (i + 1):] = distances
+            D[(i + 1):, i] = distances
+
+    else:
+        for i in range(X.shape[0]):
+            D[i] = (np.sum((abs(Y - X[i])) ** p, axis=1)) ** (1 / p)
+
+    return D
+
 def get_distance_matrices(title, stage=None, stored=False, mats=None):
     """
     Creates or loads matrices of distances between data points
@@ -135,15 +151,27 @@ def get_distance_matrices(title, stage=None, stored=False, mats=None):
             m_list.append(np.load(path))
 
     else:
-        d_train = distance_matrix(mats[0], mats[0])
+        # d_train = distance_matrix(mats[0], mats[0])
+        # path = os.path.join(dir2, title + '_train')
+        # np.save(path, d_train)
+        # m_list.append(d_train)
+        # d_test = distance_matrix(mats[0], mats[1])
+        # path = os.path.join(dir2, title + '_test')
+        # np.save(path, d_test)
+        # m_list.append(d_test)
+        # d_val = distance_matrix(mats[0], mats[2])
+        # path = os.path.join(dir2, title + '_val')
+        # np.save(path, d_val)
+        # m_list.append(d_val)
+        d_train = minkowski_distance(mats[0], mats[0])
         path = os.path.join(dir2, title + '_train')
         np.save(path, d_train)
         m_list.append(d_train)
-        d_test = distance_matrix(mats[0], mats[1])
+        d_test = minkowski_distance(mats[0], mats[1])
         path = os.path.join(dir2, title + '_test')
         np.save(path, d_test)
         m_list.append(d_test)
-        d_val = distance_matrix(mats[0], mats[2])
+        d_val = minkowski_distance(mats[0], mats[2])
         path = os.path.join(dir2, title + '_val')
         np.save(path, d_val)
         m_list.append(d_val)
@@ -224,12 +252,25 @@ def testing(model, X_test, y_test, d_test, classification):
 
 
 def add_image_corruption(X, level=0.1):
-    corrupt_elem = round(X.shape[0] * X.shape[1] * level)
-    corrupt_coor = []
-    while len(corrupt_coor) < corrupt_elem:
-        x_coor = random.randint(0, X.shape[0] - 1)
-        y_coor = random.randint(0, X.shape[1] - 1)
-        val = random.randint(0, 16)
-        corrupt_coor.append((x_coor, y_coor))
-        X[x_coor, y_coor] = val
+    if level > 0.0:
+        corrupt_elem = round(X.shape[0] * X.shape[1] * level)
+        corrupt_coor = []
+        while len(corrupt_coor) < corrupt_elem:
+            x_coor = random.randint(0, X.shape[0] - 1)
+            y_coor = random.randint(0, X.shape[1] - 1)
+            val = random.randint(0, 16)
+            corrupt_coor.append((x_coor, y_coor))
+            X[x_coor, y_coor] = val
     return X
+
+
+def shuffle_labels(y_train, y_stack_train, shuffled):
+    if shuffled > 0.0:
+        ix_size = int(shuffled * len(y_train))
+        ix = np.random.choice(len(y_train), size=ix_size, replace=False)
+        b = y_train[ix]
+        c = y_stack_train[ix, :]
+        b_shuffled, c_shuffled = sklearn.utils.shuffle(b, c)
+        y_train[ix] = b_shuffled
+        y_stack_train[ix] = c_shuffled
+    return y_train, y_stack_train

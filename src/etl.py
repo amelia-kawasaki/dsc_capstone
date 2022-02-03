@@ -5,7 +5,7 @@ from feats import unmulticlass
 import numpy as np
 import utils
 import sklearn
-
+from keras.datasets import mnist
 
 def read_params(file):
 
@@ -41,9 +41,10 @@ def get_raw_data(params):
     classification = None
     if params['data']['dataset'] == 'mnist':
         #importing the data
-        dataset = datasets.load_digits()
-        X = dataset.data
-        y = dataset.target
+        (x_train, y_train), (X, y) = mnist.load_data()
+        # X = np.vstack((x_train, x_test))
+        X = X.reshape(X.shape[0], (X.shape[1] * X.shape[2]))
+        # y = np.hstack((y_train, y_test))
 
         y_stack = np.zeros_like(y.reshape(-1, 1))
         for i in np.unique(y):
@@ -66,24 +67,13 @@ def train_test_val_distances(X, y, y_stack, params, stage, shuffled, corruption)
     X_train, X_test, y_train, y_test, y_stack_train, y_stack_test = train_test_split(X, y, y_stack, test_size=0.25)
     X_train, X_val, y_train, y_val, y_stack_train, y_stack_val = train_test_split(X_train, y_train, y_stack_train, test_size=0.25)
 
-    if shuffled > 0.0:
-        ix_size = int(shuffled * len(y_train))
-        ix = np.random.choice(len(y_train), size=ix_size, replace=False)
-        b = y_train[ix]
-        c = y_stack_train[ix, :]
-        b_shuffled, c_shuffled = sklearn.utils.shuffle(b, c)
-        y_train[ix] = b_shuffled
-        y_stack_train[ix] = c_shuffled
-
-    if corruption > 0.0:
-        X_train = utils.add_image_corruption(X_train, level=corruption)
-
     # getting the distance matrix for training
     if params['data']['distance_precalculations'] is True:
         d_train, d_test, d_val = utils.get_distance_matrices(params['data']['distance_files'], stage=stage, stored=True)
     else:
         d_train, d_test, d_val = utils.get_distance_matrices(params['data']['distance_files'], stage=stage, mats=[X_train, X_test, X_val])
 
+    print('distance matrices loaded')
     return [(X_train, d_train, y_train, y_stack_train), (X_test, d_test, y_test, y_stack_test), (X_val, d_val, y_val, y_stack_val)]
 
 

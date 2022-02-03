@@ -55,10 +55,14 @@ elif args.target == 'all':
     X_results = []
     y_results = []
 
-    for j in [0.0, 0.01, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]:
-        data = etl.etl_data(params, shuffled=j, stage=args.target)
+    data = etl.etl_data(params, stage=args.target)
 
-        [(X_train, d_train, y_train, y_stack_train), (X_test, d_test, y_test, y_stack_test), (X_val, d_val, y_val, y_stack_val)] = data
+    [(X_train, d_train, y_train, y_stack_train), (X_test, d_test, y_test, y_stack_test),
+     (X_val, d_val, y_val, y_stack_val)] = data
+
+    for j in [0.0, 0.01, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]:
+
+        y_train, y_stack_train = utils.shuffle_labels(y_train, y_stack_train, j)
 
         # creating kernel model, validating for t
         y_final_test = np.zeros((X_test.shape[0], y_stack_train.shape[1]))
@@ -83,7 +87,7 @@ elif args.target == 'all':
         print('finished ' + str(j))
 
     plt.plot(X_results, y_results)
-    plt.title('Gaussian Kernel: Noise vs Accuracy')
-    plt.xlabel('Noise in Training Set')
+    plt.title('Gaussian Kernel: Label Corruption vs Accuracy')
+    plt.xlabel('Proportion of Shuffled Labels in Training Set')
     plt.ylabel('Accuracy')
     plt.show()
