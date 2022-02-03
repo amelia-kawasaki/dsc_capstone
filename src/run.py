@@ -5,6 +5,7 @@ from keras.datasets import mnist
 
 from utils.kernel_functions import *
 from utils.forest_functions import *
+from utils.knn_functions import *
 
 # capture target (not yet functional)
 try:
@@ -25,6 +26,7 @@ forest_sizes = script_params['forests']['forest_sizes']
 corruption_levels = script_params['corruption_levels']
 filter_sizes = script_params['filter_sizes']
 sigmas = script_params['sigmas']
+neighbor_count = script_params['neighbor_count']
     
 # Collect data
 (train_X, train_y), (test_X, test_y) = mnist.load_data()
@@ -61,6 +63,11 @@ if 'forest' in model_types:
         
     if 'gauss' in corruption_types:
         results['forest']['gauss'] = run_gaussian_blur_forests(train_X, train_y, test_X, test_y, 10, forest_sizes, filter_sizes, sigmas)
-        
+
+if 'knn' in model_types:
+
+    if 'label' in corruption_types:
+        results['knn']['label'] = run_label_corruption_knn(train_X, train_y, test_X, test_y, 10, neighbor_count, corruption_levels)
+
 with open('../out/results.json', 'w') as f:
     json.dump(results, f)

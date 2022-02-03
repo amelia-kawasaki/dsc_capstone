@@ -1,8 +1,8 @@
 {
     "num_train": 2500,
     "num_test": 1000,
-    "corruption_types": ["label", "random", "gauss"],
-    "model_types": ["kernel", "forest"],
+    "corruption_types": ["label"],
+    "model_types": ["knn"],
     "kernels": {
         "powers": [2, 1]
     },
@@ -11,5 +11,6 @@
     },
     "corruption_levels": [0.0, 0.2, 0.4, 0.6, 0.8, 0.9],
     "filter_sizes": [3, 11],
-    "sigmas": [1.0, 3.0]
+    "sigmas": [1.0, 3.0],
+    "neighbor_count": [1, 5, 10, 20]
 }
