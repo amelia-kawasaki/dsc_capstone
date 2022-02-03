@@ -1,0 +1,15 @@
+{
+    "num_train": 2500,
+    "num_test": 1000,
+    "corruption_types": ["label", "random", "gauss"],
+    "model_types": ["kernel", "forest"],
+    "kernels": {
+        "powers": [2, 1]
+    },
+    "forests": {
+        "forest_sizes": [1, 100]
+    },
+    "corruption_levels": [0.0, 0.2, 0.4, 0.6, 0.8, 0.9],
+    "filter_sizes": [3, 11],
+    "sigmas": [1.0, 3.0]
+}
