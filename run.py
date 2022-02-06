@@ -14,7 +14,8 @@ logging.basicConfig(filename='out/script_progress.log', level=logging.DEBUG, for
 try:
     target = sys.argv[1].lower()
 except:
-    raise ValueError('Arguments unknown, usage: run.py [target] [config json]')
+    # raise ValueError('Arguments unknown, usage: run.py [target] [config json]')
+    target = None
 
 if target == 'clean':
     built_files = [
@@ -39,6 +40,11 @@ elif target == 'all':
     except:
         raise ValueError('Configuration json required for target all, usage: run.py all [config json]')
     with open(args, 'r') as f:
+        script_params = json.load(f)
+elif target is None:
+    # assume run all with params.json
+    target = 'all'
+    with open('params.json', 'r') as f:
         script_params = json.load(f)
 else:
     raise ValueError('Target unknown, use "test" for test or use "all" for all')
