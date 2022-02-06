@@ -69,5 +69,8 @@ if 'knn' in model_types:
     if 'label' in corruption_types:
         results['knn']['label'] = run_label_corruption_knn(train_X, train_y, test_X, test_y, 10, neighbor_count, corruption_levels)
 
+    if 'random' in corruption_types:
+        results['knn']['random'] = run_random_corruption_knn(train_X, train_y, test_X, test_y, 10, neighbor_count, corruption_levels)
+
 with open('../out/results.json', 'w') as f:
     json.dump(results, f)
