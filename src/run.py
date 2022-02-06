@@ -11,12 +11,21 @@ from utils.knn_functions import *
 try:
     target = sys.argv[1].lower()
 except:
-    target = None
-    
-# Read script parameters
-with open('../utils/params.json', 'r') as f:
-    script_params = json.load(f)
-    
+    raise ValueError('Arguments unknown, usage: run.py [target] [config json]')
+
+if target == 'test':
+    with open('../test/test_params.json', 'r') as f:
+        script_params = json.load(f)
+elif target == 'all':
+    try:
+        args = sys.argv[2].lower()
+    except:
+        raise ValueError('Configuration json required for target all, usage: run.py all [config json]')
+    with open(args, 'r') as f:
+        script_params = json.load(f)
+else:
+    raise ValueError('Target unknown, use "test" for test or use "all" for all')
+
 num_train = int(script_params['num_train'])
 num_test = int(script_params['num_test'])
 corruption_types = script_params['corruption_types']
