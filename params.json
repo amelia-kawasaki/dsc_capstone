@@ -1,8 +1,8 @@
 {
-    "num_train": 2500,
-    "num_test": 1000,
-    "corruption_types": ["random"],
-    "model_types": ["knn"],
+    "num_train": 10000,
+    "num_test": 2000,
+    "corruption_types": ["label", "random"],
+    "model_types": ["kernel", "forest", "knn"],
     "kernels": {
         "powers": [2, 1]
     },
