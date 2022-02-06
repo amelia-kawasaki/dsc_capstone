@@ -1,1 +1,0 @@
-Branch for add k-nearest neighbors compatibility

@@ -14,7 +14,7 @@ except:
     raise ValueError('Arguments unknown, usage: run.py [target] [config json]')
 
 if target == 'test':
-    with open('../test/test_params.json', 'r') as f:
+    with open('test/test_params.json', 'r') as f:
         script_params = json.load(f)
 elif target == 'all':
     try:
@@ -81,5 +81,5 @@ if 'knn' in model_types:
     if 'random' in corruption_types:
         results['knn']['random'] = run_random_corruption_knn(train_X, train_y, test_X, test_y, 10, neighbor_count, corruption_levels)
 
-with open('../out/results.json', 'w') as f:
+with open('out/results.json', 'w') as f:
     json.dump(results, f)
