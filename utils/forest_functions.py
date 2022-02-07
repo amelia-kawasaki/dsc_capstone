@@ -58,11 +58,14 @@ def run_random_corruption_forests(train_X, train_y, test_X, test_y, num_labels, 
     accs = {}
     for n in forest_sizes:
         accs[n] = []
+        
+    min_val = np.min(train_X)
+    max_val = np.max(train_X)
     
     for c in corruption_levels:
         
         corrupted_X = train_X.copy()
-        corrupted_X = cor.random_filter(corrupted_X, c)
+        corrupted_X = cor.random_filter(corrupted_X, c, min_val, max_val)
         
         for n in forest_sizes:
             
