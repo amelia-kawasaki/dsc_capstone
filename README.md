@@ -7,6 +7,7 @@ Please build the project using the Docker container located at the DockerHub rep
 ### Running the Project:
 To run on all data:
 > python3 run.py
+
 Or with a custom config file:
 > python3 run.py all [json config file]
 
