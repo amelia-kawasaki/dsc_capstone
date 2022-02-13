@@ -1,4 +1,5 @@
 ## Exploring Noise in Data
+Robert Dunn, Amelia Kawasaki, Cheolmin Hwang
 
 ### Why do we care about noise in our data?
 
