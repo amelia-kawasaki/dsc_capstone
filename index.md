@@ -1,37 +1,17 @@
-## Welcome to GitHub Pages
+## Exploring Noise in Data
 
-You can use the [editor on GitHub](https://github.com/amelia-kawasaki/dsc_capstone/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
+### Why do we care about noise in our data?
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+Noise level of training data is key to the performace of a prediction model.
 
-### Markdown
+### Methodology
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+Used MNIST dataset and other image datasets.
 
-```markdown
-Syntax highlighted code block
+Corrupted the datasets by swapping their labels or by altering the pixels of images.
 
-# Header 1
-## Header 2
-### Header 3
+Tested training on multiple models: Gaussian/Laplacian kernel functions, K-Nearest Neighbor classifier, Random Forest Classifier, Neural Network.
 
-- Bulleted
-- List
+### Results
 
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-For more details see [Basic writing and formatting syntax](https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/amelia-kawasaki/dsc_capstone/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+(results)
