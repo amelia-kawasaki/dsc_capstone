@@ -17,5 +17,5 @@ To run the code on test section of data:
 To clean all output files:
 > python3 run.py clean
 
-Our website for an introduction to our project:
+Website for an introduction to our project:
 https://amelia-kawasaki.github.io/dsc_capstone/
