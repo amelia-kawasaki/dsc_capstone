@@ -101,3 +101,19 @@ def run_gaussian_blur_forests(train_X, train_y, test_X, test_y, num_labels, fore
                 accs[f][n].append(acc)
     
     return accs
+
+def run_multi_forests(train_X, train_y, test_X, test_y, num_labels, forest_sizes, corruption_levels, cor_type = 'label', num_iter = 3):
+    all_accs = {}
+    for n in forest_sizes:
+        all_accs[n] = []
+    
+    for _ in range(num_iter):
+        if cor_type == 'label':
+            iter_acc = run_label_corruption_forests(train_X, train_y, test_X, test_y, num_labels, forest_sizes, corruption_levels)
+        elif cor_type == 'random':
+            iter_acc = run_random_corruption_forests(train_X, train_y, test_X, test_y, num_labels, forest_sizes, corruption_levels)
+            
+        for n in forest_sizes:
+            all_accs[n].append(iter_acc[n])
+            
+    return all_accs
