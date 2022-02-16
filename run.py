@@ -5,6 +5,7 @@ import os
 from utils.kernel_functions import *
 from utils.forest_functions import *
 from utils.knn_functions import *
+from utils.neural_net_functions import *
 from utils.etl import etl, etl_test
 
 # setup logging
@@ -27,6 +28,11 @@ if target == 'clean':
     for f in built_files:
         if os.path.exists(f):
             os.remove(f)
+    # clean all figs
+    for f in os.listdir('notebooks/figs'):
+        if f.endswith('.md'):
+            continue
+        os.remove(os.path.join('notebooks/figs', f))
     # end script
     exit()
 elif target == 'test':
@@ -53,13 +59,14 @@ else:
 num_train = int(script_params['num_train'])
 num_test = int(script_params['num_test'])
 corruption_types = script_params['corruption_types']
-model_types = script_params['model_types']
-powers = script_params['kernels']['powers']
-forest_sizes = script_params['forests']['forest_sizes']
 corruption_levels = script_params['corruption_levels']
-filter_sizes = script_params['filter_sizes']
-sigmas = script_params['sigmas']
-neighbor_count = script_params['neighbor_count']
+model_types = script_params['model_types']
+powers = script_params['kernel_powers']
+forest_sizes = script_params['forest_sizes']
+neighbor_count = script_params['knn_neighbor_count']
+benchmarks = script_params['nn_benchmarks']
+filter_sizes = script_params['gauss_cor']['filter_sizes']
+sigmas = script_params['gauss_cor']['sigmas']
 num_labels = 10
 
 # load and setup data
@@ -91,11 +98,11 @@ if 'kernel' in model_types:
 if 'forest' in model_types:
 
     if 'label' in corruption_types:
-        results['forest']['label'] = run_label_corruption_forests(train_X, train_y, test_X, test_y, 10, forest_sizes, corruption_levels)
+        results['forest']['label'] = run_multi_forests(train_X, train_y, test_X, test_y, 10, forest_sizes, corruption_levels, 'label', 5)
         logging.debug(f'Finished forests with label corruption at')
 
     if 'random' in corruption_types:
-        results['forest']['random'] = run_random_corruption_forests(train_X, train_y, test_X, test_y, 10, forest_sizes, corruption_levels)
+        results['forest']['random'] = run_multi_forests(train_X, train_y, test_X, test_y, 10, forest_sizes, corruption_levels, 'random', 5)
         logging.debug(f'Finished forests with random corruption at')
 
     if 'gauss' in corruption_types:
@@ -112,6 +119,20 @@ if 'knn' in model_types:
     if 'random' in corruption_types:
         results['knn']['random'] = run_random_corruption_knn(train_X, train_y, test_X, test_y, 10, neighbor_count, corruption_levels)
         logging.debug(f'Finished knns with random corruption at')
+
+# override test data to work with nn model
+_, data = etl(num_train, num_test, model_types)
+train_X, train_y, test_X, test_y = data
+        
+if 'nets' in model_types:
+    
+    if 'label' in corruption_types:
+        results['nets']['label'] = run_label_corruption_nets(train_X, train_y, test_X, test_y, 10, benchmarks, corruption_levels)
+        logging.debug(f'Finished neural nets with label corruption at')
+        
+    if 'random' in corruption_types:
+        results['nets']['random'] = run_random_corruption_nets(train_X, train_y, test_X, test_y, 10, benchmarks, corruption_levels)
+        logging.debug(f'Finished neural nets with random corruption at')
 
 logging.debug(f'Finished at')
         
