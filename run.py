@@ -65,6 +65,7 @@ powers = script_params['kernel_powers']
 forest_sizes = script_params['forest_sizes']
 neighbor_count = script_params['knn_neighbor_count']
 benchmarks = script_params['nn_benchmarks']
+num_iter = script_params['num_iter']
 filter_sizes = script_params['gauss_cor']['filter_sizes']
 sigmas = script_params['gauss_cor']['sigmas']
 num_labels = 10
@@ -98,11 +99,11 @@ if 'kernel' in model_types:
 if 'forest' in model_types:
 
     if 'label' in corruption_types:
-        results['forest']['label'] = run_multi_forests(train_X, train_y, test_X, test_y, 10, forest_sizes, corruption_levels, 'label', 5)
+        results['forest']['label'] = run_multi_forests(train_X, train_y, test_X, test_y, 10, forest_sizes, corruption_levels, 'label', num_iter)
         logging.debug(f'Finished forests with label corruption at')
 
     if 'random' in corruption_types:
-        results['forest']['random'] = run_multi_forests(train_X, train_y, test_X, test_y, 10, forest_sizes, corruption_levels, 'random', 5)
+        results['forest']['random'] = run_multi_forests(train_X, train_y, test_X, test_y, 10, forest_sizes, corruption_levels, 'random', num_iter)
         logging.debug(f'Finished forests with random corruption at')
 
     if 'gauss' in corruption_types:
@@ -127,11 +128,11 @@ train_X, train_y, test_X, test_y = data
 if 'nets' in model_types:
     
     if 'label' in corruption_types:
-        results['nets']['label'] = run_label_corruption_nets(train_X, train_y, test_X, test_y, 10, benchmarks, corruption_levels)
+        results['nets']['label'] = run_label_corruption_nets(train_X, train_y, test_X, test_y, 10, benchmarks, corruption_levels, num_iter)
         logging.debug(f'Finished neural nets with label corruption at')
         
     if 'random' in corruption_types:
-        results['nets']['random'] = run_random_corruption_nets(train_X, train_y, test_X, test_y, 10, benchmarks, corruption_levels)
+        results['nets']['random'] = run_random_corruption_nets(train_X, train_y, test_X, test_y, 10, benchmarks, corruption_levels, num_iter)
         logging.debug(f'Finished neural nets with random corruption at')
 
 logging.debug(f'Finished at')

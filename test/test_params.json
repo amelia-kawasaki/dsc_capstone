@@ -8,6 +8,7 @@
     "forest_sizes": [1, 100],
     "knn_neighbor_count": [1, 5],
     "nn_benchmarks": [3, 5],
+    "num_iter": 3,
     "gauss_cor": {
         "filter_sizes": [3, 11],
         "sigmas": [1.0, 3.0]
