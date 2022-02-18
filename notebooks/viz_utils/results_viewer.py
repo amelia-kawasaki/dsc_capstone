@@ -10,7 +10,7 @@ def display_results(model_type = 'all', corruption_type = 'all', save_figs = Fal
         with open('../out/results.json', 'r') as f:
             results = json.load(f)
 
-        with open('../utils/params.json', 'r') as f:
+        with open('../params.json', 'r') as f:
             params = json.load(f)
 
         print('Full results have been loaded')
