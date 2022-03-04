@@ -24,4 +24,6 @@ Tested training on multiple models: Gaussian/Laplacian kernel functions, K-Neare
 
 ### Results
 
+![test](/img/forest-label.png)
+
 (results)
