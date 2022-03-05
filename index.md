@@ -24,9 +24,7 @@ Tested training on multiple models: Gaussian/Laplacian kernel functions, K-Neare
 
 ### Results - Label Corruption
 
-<!-- ![kernel-label](/img/kernel-label.png | width = 40%) -->
-<img src = "/img/kernel-label.png" width = "40%">
-
+![kernel-label](/img/kernel-label.png)
 ![knn-label](/img/knn-label.png)
 
 ![forest-label](/img/forest-label.png)
