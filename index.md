@@ -29,11 +29,11 @@ Tested training on multiple models: Gaussian/Laplacian kernel functions, K-Neare
 ![forest-label](/img/forest-label.png)
 ![net-label](/img/net-label.png)
 
-## Significance of Results - Label Corruption
-
-### Results - Random Corruption
+### Significance of Results - Label Corruption
 
 As seen, it is fairly easy for a model to be overfit by label corruption. However, certain models are able to resist such corruption. Something to note however is the difference between the results of the random forests and k-nearest neighbors versus the kernel machines and neural networks. Specifically, in the case of the random forests and k-nearest neighbor models, the models tend to keep a relatively high accuracy with the addition of corrupted labels when the model becomes more 'deep.' This means that by adding more trees or more neighbors to the respective model, the resulting model has a higher resistance to label corruption. On the other hand, kernel machines and neural networks both work in separate ways. For the case of neural networks, it can be seen that overtraining the network leads to better performance in completely clean data, whereas with any level of corruption, training the network for too long leads to a large decrease in accuracy as the model begins to overfit. Lastly, kernels work different entirely because changing the power of the kernel function only changes how the classifier is calculated rather than making the model more deep than the other three models.
+
+### Results - Random Corruption
 
 ![kernel-random](/img/kernel-random.png)
 ![knn-random](/img/knn-random.png)
