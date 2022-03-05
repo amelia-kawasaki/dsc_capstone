@@ -22,8 +22,22 @@ Corrupted the datasets by randomizing a set proportion of their labels or the pi
 
 Tested training on multiple models: Gaussian/Laplacian kernel functions, K-Nearest Neighbor classifier, Random Forest Classifier, Neural Network.
 
-### Results
+### Results - Label Corruption
 
-![test](/img/forest-label.png)
+![kernel-label](/img/kernel-label.png)
 
-(results)
+![knn-label](/img/knn-label.png)
+
+![forest-label](/img/forest-label.png)
+
+![net-label](/img/net-label.png)
+
+### Results - Random Corruption
+
+![kernel-random](/img/kernel-random.png)
+
+![knn-random](/img/knn-random.png)
+
+![forest-random](/img/forest-random.png)
+
+![net-random](/img/net-random.png)
